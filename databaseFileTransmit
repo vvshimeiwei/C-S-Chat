@@ -1,0 +1,70 @@
+package com.qq.main;
+
+import java.sql.Blob;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+
+import org.omg.CORBA.PUBLIC_MEMBER;
+
+
+import sun.misc.IOUtils;
+
+import java.io.*;
+
+
+public class databaseFileTransmit {
+	String driver = "com.mysql.jdbc.Driver";     
+	String url = "jdbc:mysql://127.0.0.1:3306/QQ?useUnicode=true&characterEncoding=UTF-8";           
+	String user = "root";                   
+	String password = "201314";
+	    
+	public boolean insertFileIntoDatabase(String fileName,String filePath) throws Exception  {               
+		Class.forName(driver);  
+	   
+	    Connection conn = DriverManager.getConnection(url, user, password);  
+	    if(!conn.isClosed()){
+	    	System.out.println("Succeeded connecting to the Database!");  
+	    }else {
+	        System.out.println("unable to connect to the Datbase!");
+		}
+	    String sql = "insert into blobfile(filename,data) values(?,?)";
+	    PreparedStatement pstmt = conn.prepareStatement(sql);
+	    pstmt.setString(1, fileName);
+		InputStream in= new FileInputStream(filePath);
+	    pstmt.setBinaryStream(2, in);//Ϊ�ڶ���������ֵΪ������
+	    try {
+	    	pstmt.executeUpdate();
+	    	return true;
+	    }catch (Exception e) {
+			return false;
+		}
+	} 
+	
+	public void getFileFromDatabase(String filename) throws Exception {
+		Class.forName(driver);
+		Connection conn = DriverManager.getConnection(url, user, password);
+		String sql = "select data from blobfile where filename=?";
+		PreparedStatement pstmt = conn.prepareStatement(sql);
+		pstmt.setString(1, filename);
+		ResultSet rs = pstmt.executeQuery();
+		
+		byte[] buffer=new byte[4096];
+		while (rs.next()){
+
+			OutputStream out=new FileOutputStream("C:/Users/lenovo/Downloads/"+filename);
+			InputStream in=rs.getBinaryStream("data");
+			int size=0;
+			while ((size=in.read(buffer))!=-1)
+				out.write(buffer, 0, size);
+			in.close();
+			out.close();
+		}
+		pstmt.close();
+		conn.close();
+	}
+	 
+}
