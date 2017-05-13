@@ -1,0 +1,131 @@
+package com.qq.main;
+
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.HeadlessException;
+import java.awt.Toolkit;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.sql.SQLException;
+
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JPasswordField;
+import javax.swing.JTextField;
+
+import com.qq.regist.Regist;
+import com.qq.regist.UserInformation;
+
+/**
+ * QQ的主界面
+ * 
+ * @param args
+ */
+
+public class Main extends JFrame {
+
+	private JLabel userId;
+	private JLabel userPassword;
+	private JTextField inputId;
+	private JPasswordField inputPassword;
+	private JButton btLogin;
+	private JButton btRegist;
+
+	Main() {
+		userId = new JLabel("帐号");
+		userPassword = new JLabel("密码");
+		inputId = new JTextField(6);// 疑问：？？
+		inputPassword = new JPasswordField();
+		btLogin = new JButton("登陆");
+		btRegist = new JButton("注册");
+		//设置窗体背景
+		String path="D:/oh my 课件们/51CTO下载-Java源码的仿QQ聊天程序/codefans.net/QQ/QQ/Untitledcopy.jpg";
+		ImageIcon background= new ImageIcon(path);
+		JLabel label=new JLabel(background);
+		label.setBounds(0, 0, 300, 300);
+		JPanel imagePanel=(JPanel)this.getContentPane();
+		imagePanel.setOpaque(false);
+		// 设置窗体属性
+//		Toolkit tk = Toolkit.getDefaultToolkit();
+//		Dimension screenSize = tk.getScreenSize();
+//		int x = (int) screenSize.getWidth();
+//		int y = (int) screenSize.getHeight();
+//		this.setBounds((x - 240) / 2, (y - 600) / 2, 240, 600);
+		this.setResizable(false);
+		this.setLayout(null);
+		this.setLocation(500, 300);
+		this.setSize(300, 300);
+
+		this.setBackground(Color.BLACK);// 疑问？？
+		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+		// 设置JLabel属性
+				userId.setBounds(65, 60, 60, 20);
+				userPassword.setBounds(65, 90, 40, 20);
+				userId.setFont(new Font("Dialog", 1, 14));
+				userPassword.setFont(new Font("Dialog", 1, 14));
+				// 设置文本域属性
+				inputId.setBounds(135, 60, 100, 20);
+				inputPassword.setBounds(135, 90, 100, 20);
+				inputPassword.setEchoChar('*');
+				// 设置JButton属性
+				btLogin.setBounds(60, 170, 80, 30);
+				btRegist.setBounds(160, 170, 80, 30);
+				btLogin.setFont(new Font("Dialog", 1, 14));
+				btRegist.setFont(new Font("Dialog", 1, 14));
+
+
+		// 注册《登陆》按钮监听器
+		btLogin.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				UserInformation user = new UserInformation();
+				String userName = inputId.getText();
+				String userPassword = new String(inputPassword.getPassword());
+				if (userName.equals("")) {
+					JOptionPane.showMessageDialog(null, "用户名不能为空");
+				} else if ("".equals(userPassword)) {
+					JOptionPane.showMessageDialog(null, "密码不能为空");
+				} else
+					try{
+					if (user.isExist(userName)
+						&& user.isPasswordCorrect(userName).equals(
+								userPassword)) {
+					// 判断成功后new一个群聊窗口
+					new AllTalkFrame(userName).setVisible(true);
+					Main.this.dispose();
+				} else {
+					JOptionPane.showMessageDialog(null, "此用户名不存在或者密码不正确");
+				}
+				}catch(HeadlessException | ClassNotFoundException | SQLException e1)
+				{
+					e1.printStackTrace();
+				}
+			}
+		});
+
+		// 注册《注册》按钮监听器
+		btRegist.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				new Regist();
+			}
+		});
+		this.add(userId);
+		this.add(userPassword);
+		this.add(inputId);
+		this.add(inputPassword);
+		this.add(btLogin);
+		this.add(btRegist);
+		this.setVisible(true);
+		this.getLayeredPane().add(label, new Integer(Integer.MIN_VALUE));
+
+	}
+
+	public static void main(String[] args) {
+		new Main();
+	}
+}
