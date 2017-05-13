@@ -1,0 +1,68 @@
+package com.qq.regist;
+
+
+
+import java.sql.*;
+//Download by http://www.codefans.net
+public class UserInformation {  
+	String driver = "com.mysql.jdbc.Driver";         
+    String url = "jdbc:mysql://127.0.0.1:3306/qq";          
+    String user = "root";                   
+    String password = "201314";  
+    String name;  
+    public boolean isExist(String userName) throws ClassNotFoundException, SQLException {            
+        // 加载数据库驱动程序        
+		Class.forName(driver);  
+        // 连接数据库       
+        Connection conn = DriverManager.getConnection(url, user, password);  
+        String sql = "select userID from user where userID='"+userName+"'";
+        Statement statement=conn.createStatement();
+        
+            
+        if(!conn.isClosed()){
+        	System.out.println("Succeeded connecting to the Database!");  
+ 
+        }else {
+        	System.out.println("unable to connect to the Datbase!");
+		}
+       
+     	ResultSet set=statement.executeQuery(sql);
+     	if (set.next()){
+     		return true;
+     	}else{
+			return false;
+     	}
+	}
+
+
+    public void insert(String userName, String userPassword) throws SQLException {
+		String sql = "insert into user values ('"+userName+"','"+userPassword+"')";
+		Connection conn = DriverManager.getConnection(url, user, password);  
+        if(!conn.isClosed())          
+        System.out.println("Succeeded connecting to the Database!");              
+        Statement statement = conn.createStatement();       
+        statement.executeUpdate(sql);
+	}
+
+public String isPasswordCorrect(String userName) throws SQLException{
+		
+		Connection conn = DriverManager.getConnection(url, user, password);  
+        if(!conn.isClosed())          
+        	System.out.println("Succeeded connecting to the Database!");  
+        PreparedStatement pStatement=conn.prepareStatement("select password from user where userID=?");
+        pStatement.setString(1, userName);
+        ResultSet rs = pStatement.executeQuery();
+        
+        String returnPassword="";
+        while(rs.next())  {           
+            returnPassword = rs.getString("password");
+        }
+        rs.close();
+        pStatement.close();
+        conn.close();
+        
+        return returnPassword;
+	}
+
+}  
+
